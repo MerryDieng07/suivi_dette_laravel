@@ -14,10 +14,36 @@ use App\Http\Requests\UpdateArticleRequest;
 class ArticleController extends Controller
 {
     use RestResponseTrait;
+
+
+    public function getByLibelle($libelle)
+    {
+        $article = Article::where('libelle', $libelle)->first();
+
+        if (!$article) {
+            return response()->json([
+                'status' => 404,
+                'data' => null,
+                'message' => 'Article non trouvé',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'data' => new ArticleResource($article),
+            'message' => 'Article trouvé',
+        ]);
+    }
+
+
+    // ... autres méthodes ...
+
+
     public function index(Request $request)
     {
         $query = Article::query();
 
+        // Filtrer par disponibilité
         if ($request->has('disponible')) {
             $disponible = $request->input('disponible');
             if ($disponible === 'oui') {
@@ -27,13 +53,18 @@ class ArticleController extends Controller
             }
         }
 
+        // Filtrer par libellé
+        if ($request->has('libelle')) {
+            $query->filterByLibelle($request->input('libelle'));
+        }
+
         $articles = $query->get();
 
         if ($articles->isEmpty()) {
             return response()->json([
                 'status' => 200,
                 'data' => null,
-                'message' => 'Pas Articles',
+                'message' => 'Aucun article touvé',
             ]);
         }
 
@@ -43,6 +74,7 @@ class ArticleController extends Controller
             'message' => 'Liste des articles',
         ]);
     }
+
     public function updateStock(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -51,10 +83,10 @@ class ArticleController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => 411,
+                'status' => 422,
                 'data' => null,
                 'message' => 'Validation failed',
-            ], 411);
+            ], 422);
         }
 
         $article = Article::find($id);
@@ -88,9 +120,6 @@ class ArticleController extends Controller
         ], 201);
     }
 
-    /**
-     * Modifier un article existant.
-     */
     public function update(UpdateArticleRequest $request, Article $article)
     {
         $article->update($request->validated());
@@ -102,9 +131,6 @@ class ArticleController extends Controller
         ]);
     }
 
-    /**
-     * Supprimer un article.
-     */
     public function destroy(Article $article)
     {
         $article->delete();
@@ -113,6 +139,15 @@ class ArticleController extends Controller
             'status' => 200,
             'data' => null,
             'message' => 'Article supprimé avec succès',
+        ]);
+    }
+
+    public function show(Article $article)
+    {
+        return response()->json([
+            'status' => 200,
+            'data' => new ArticleResource($article),
+            'message' => 'Détails de l\'article',
         ]);
     }
 }

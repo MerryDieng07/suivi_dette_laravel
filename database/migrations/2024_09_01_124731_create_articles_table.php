@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
+            $table->string('libelle');
+            $table->decimal('prix', 8, 2);
+            $table->integer('qteStock');
             $table->timestamps();
         });
     }

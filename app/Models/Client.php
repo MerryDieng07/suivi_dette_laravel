@@ -9,10 +9,8 @@ use App\Enums\EtatEnum;
 
 class Client extends Model
 {
-    
     use HasFactory;
 
-   // public mixed $user_id;
     protected $fillable = [
         'surname',
         'adresse',
@@ -20,7 +18,6 @@ class Client extends Model
         'user_id',
     ];
     protected $hidden = [
-        //  'password',
         'created_at',
         'updated_at',
     ];
@@ -29,4 +26,20 @@ class Client extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Scope pour filtrer les clients par numéro de téléphone.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $telephone
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeClientByTelephone($query, $telephone)
+    {
+        
+        return $query->where('telephone', $telephone);
+    }
+
+    
+    
 }

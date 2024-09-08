@@ -10,6 +10,9 @@ use App\Traits\RestResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 
 class StoreClientRequest extends FormRequest
@@ -39,7 +42,7 @@ class StoreClientRequest extends FormRequest
         'user.nom' => ['required_with:user', 'string'],
         'user.prenom' => ['required_with:user', 'string'],
         'user.login' => ['required_with:user', 'string'],
-        'user.roleId' => ['required_with:user'], // Assurez-vous que les rôles sont valides
+        'user.role_id' => ['required_with:user'], // Assurez-vous que les rôles sont valides
         'user.password' => ['required_with:user', new CustumPasswordRule()],
         'user.etat' => ['required_with:user', 'string', 'in:ACTIF'], // Validation pour l'état
     ];

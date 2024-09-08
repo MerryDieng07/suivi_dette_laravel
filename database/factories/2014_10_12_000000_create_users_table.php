@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->foreignId('roleId')->constraint('roles')->ondelete('cascade');
             $table->string('photo')->nullable();
+            $table->enum('active', ['actif', 'inactif'])->default('inactif');
             
         
             $table->timestamps();

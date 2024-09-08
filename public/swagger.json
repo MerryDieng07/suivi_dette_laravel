@@ -1,0 +1,295 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API Client",
+      "version": "1.0.0",
+      "description": "API pour gérer les clients"
+    },
+    "servers": {
+        "url": "http://localhost:3000"
+  
+    },
+     
+    "paths": {
+      "/clients": {
+        "get": {
+          "summary": "List all clients",
+          "tags": ["Clients"],
+          "parameters": [
+            {
+              "name": "include",
+              "in": "query",
+              "description": "Include related resources",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "active",
+              "in": "query",
+              "description": "Filter by active status",
+              "schema": {
+                "type": "string",
+                "enum": ["oui", "non"]
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A list of clients",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ClientCollection"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new client",
+          "tags": ["Clients"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreClientRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Client created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ClientResource"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request"
+            }
+          }
+        }
+      },
+      "/clients/{id}": {
+        "get": {
+          "summary": "Get a client by ID",
+          "tags": ["Clients"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Client ID",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Client details",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ClientResource"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Client not found"
+            }
+          }
+        },
+        "put": {
+          "summary": "Update a client",
+          "tags": ["Clients"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Client ID",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreClientRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Client updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ClientResource"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request"
+            },
+            "404": {
+              "description": "Client not found"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete a client",
+          "tags": ["Clients"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Client ID",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Client deleted successfully"
+            },
+            "404": {
+              "description": "Client not found"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "ClientCollection": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ClientResource"
+              }
+            }
+          }
+        },
+        "ClientResource": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "example": 1
+            },
+            "surname": {
+              "type": "string",
+              "example": "Doe"
+            },
+            "adresse": {
+              "type": "string",
+              "example": "123 Rue Example"
+            },
+            "telephone": {
+              "type": "string",
+              "example": "770000000"
+            },
+            "user": {
+              "type": "object",
+              "properties": {
+                "nom": {
+                  "type": "string",
+                  "example": "John"
+                },
+                "prenom": {
+                  "type": "string",
+                  "example": "Doe"
+                },
+                "login": {
+                  "type": "string",
+                  "example": "johndoe"
+                },
+                "roleId": {
+                  "type": "integer",
+                  "example": 2
+                },
+                "etat": {
+                  "type": "string",
+                  "example": "ACTIF"
+                },
+                "photo": {
+                  "type": "string",
+                  "example": "profile.jpg"
+                }
+              }
+            }
+          }
+        },
+        "StoreClientRequest": {
+          "type": "object",
+          "properties": {
+            "surname": {
+              "type": "string",
+              "example": "Doe"
+            },
+            "adresse": {
+              "type": "string",
+              "example": "123 Rue Example"
+            },
+            "telephone": {
+              "type": "string",
+              "example": "770000000"
+            },
+            "user": {
+              "type": "object",
+              "properties": {
+                "nom": {
+                  "type": "string",
+                  "example": "John"
+                },
+                "prenom": {
+                  "type": "string",
+                  "example": "Doe"
+                },
+                "login": {
+                  "type": "string",
+                  "example": "johndoe"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password123"
+                },
+                "roleId": {
+                  "type": "integer",
+                  "example": 2
+                },
+                "etat": {
+                  "type": "string",
+                  "example": "ACTIF"
+                },
+                "photo": {
+                  "type": "string",
+                  "example": "profile.jpg"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  

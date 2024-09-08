@@ -4,6 +4,6 @@ namespace App\Enums;
 
 enum EtatEnum: string
 {
-    case Actif = 'ACTIF';
+    case ACTIF = 'ACTIF';
     case INACTIF = 'INACTIF';
 }
