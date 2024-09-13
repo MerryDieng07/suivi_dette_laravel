@@ -2,20 +2,12 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
 interface AuthentificationServiceInterface
 {
-    /**
-     * Authentifie un utilisateur et renvoie un token.
-     *
-     * @param array $credentials
-     * @return mixed
-     */
-    public function authenticate(array $credentials);
-
-    /**
-     * Déconnecte un utilisateur.
-     *
-     * @return void
-     */
-    public function logout();
+    public function login(Request $request): JsonResponse;
+    public function register(Request $request): JsonResponse;
+    public function logout(Request $request): JsonResponse;
 }

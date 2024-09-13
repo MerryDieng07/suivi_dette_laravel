@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Facade;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider;
 
 return [
 
@@ -198,6 +200,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\AuthCustomProvider::class,
+        CloudinaryServiceProvider::class,
+    
+        
         
         
         
@@ -218,5 +223,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
+    'Cloudinary' => Cloudinary::class,
+
 
 ];

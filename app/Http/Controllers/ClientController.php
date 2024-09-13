@@ -2,282 +2,102 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\StateEnum;
-use App\Traits\RestResponseTrait;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Models\Client;
-use App\Models\User;
+use App\Services\ClientService;
+use Illuminate\Http\JsonResponse;
 use App\Http\Requests\StoreClientRequest;
-use App\Http\Resources\ClientCollection;
-use Intervention\Image\Facades\Image;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\ClientResource;
+use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Database\QueryException;
-use App\Facades\PdfFacade;
-use App\Facades\QrcodeFacade;
-use App\Mail\FidelityCardMail;
-use Illuminate\Support\Facades\Mail;
 
 class ClientController extends Controller
 {
-    use RestResponseTrait;
+    protected $clientService;
 
-    public function index(Request $request): JsonResponse
+    public function __construct(ClientService $clientService)
     {
-        $include = $request->has('include') ? [$request->input('include')] : [];
+        $this->clientService = $clientService;
+    }
 
+    public function index(): JsonResponse
+    {
+        $clients = $this->clientService->getAllClients();
+        return response()->json(['data' => $clients], 200);
+    }
+
+    public function store(StoreClientRequest $request): JsonResponse
+    {
+        $client = $this->clientService->createClient($request);
+        return response()->json(['data' => $client], 201);
+    }
+
+    public function clientByTelephone(Request $request): JsonResponse
+    {
+        $telephone = $request->input('telephone');
+        // dd($telephone);
+        $client = $this->clientService->getClientByTelephone($telephone);
+        return response()->json(['data' => $client], 200);
+    }
+    public function getClients(Request $request)
+    {
+        // Récupération des paramètres de la requête
+        $comptes = $request->query('comptes');
+        $active = $request->query('active');
+
+        // Construction de la requête avec QueryBuilder
         $query = QueryBuilder::for(Client::class)
-            ->allowedFilters(['surname'])
-            ->allowedIncludes($include)
-            ->whereNotNull('user_id');
+            ->allowedFilters(['surname']) // Ajoute le filtre sur le surname (prénom ou nom de famille)
+            ->allowedIncludes(['user']); // Permet d'inclure la relation user
 
-        if ($request->has('active')) {
-            $active = $request->input('active');
-            if ($active === 'oui') {
-                $query->whereHas('user', function($q) {
-                    $q->where('active', true);
-                });
-            } elseif ($active === 'non') {
-                $query->whereHas('user', function($q) {
-                    $q->where('active', false);
-                });
-            }
+        // Filtrage basé sur la présence de comptes
+        if ($comptes !== null) {
+            // Si 'comptes' est 'oui', on vérifie la présence de la relation 'user', sinon l'absence
+            $query = $comptes === 'oui' ? $query->whereHas('user') : $query->whereDoesntHave('user');
         }
 
+        // Filtrage basé sur l'état actif ou inactif des comptes
+        if ($active !== null) {
+            // Définition de l'état en fonction de la valeur passée (oui -> ACTIF, non -> INACTIF)
+            $etat = $active === 'oui' ? 'ACTIF' : 'INACTIF';
+
+            // Ajout de la condition whereHas sur l'état du compte utilisateur
+            $query->whereHas('user', function ($query) use ($etat) {
+                $query->where('etat', $etat);
+            });
+        }
+
+        // Exécution de la requête et retour des résultats
         $clients = $query->get();
 
-        return $this->sendResponse(new ClientCollection($clients));
+        return response()->json([
+            'data' => $clients->isEmpty() ? null : $clients
+        ], 200);
     }
-
-    public function store(StoreClientRequest $request)
-    
-{
-$data=$request->validated();
-
-
-    $clientRequest = $request->only('surname', 'adresse', 'telephone');
-   
-
-
-
-
-    try {
-        DB::beginTransaction();
-
-        $clientRequest = $request->only('surname', 'address', 'telephone', 'user');
-        
-
-        $client = Client::create($clientRequest);
-
-
-        $userRequest =$data['user'];
-        if ($request->has('user')) {
-            $user = User::create($userRequest);
-            //     'nom' => $request->input('user.nom'),
-            //     'prenom' => $request->input('user.prenom'),
-            //     'login' => $request->input('user.login'),
-            //     'password' => bcrypt($request->password),
-            //     'role_id' => $request->input('user.role_id'),
-            //     'etat' => $request->input('user.etat') ?? 'ACTIF',
-            //     'photo' => $request->input('user.photo'),
-            // ]);
-        }
-        
-
-        if ($user) {
-            $client->user()->associate($user);
-            $client->save();
-        }
-
-
-        $user->client()->save($client);
-    
-        $qrCodeData = $client->telephone;
-            
-       
-        $qrCodeFileName = 'client_' . $client->id . '.png';
-        $qrCodePath = QrcodeFacade::generateQrCode($qrCodeData, $qrCodeFileName);
-
-        Mail::to($client->user->login)->send(new FidelityCardMail($client, $qrCodePath));
-      
-       
-
-        
-        
-       /*  $pdfPath = storage_path('public/pdfs/client_' . $client->id . '.pdf');
-        PdfFacade::generatePdf('pdf.client', ['client' => $client, 'qrCodePath' => $qrCodePath], $pdfPath); */
-        // Génération du QR code
-        // $qrCode = QrCode::format('png')->size(200)->generate(route('client.show', ['id' => $client->id]));
-        // Storage::put('qrcodes/'. $client->id. '.png', (string) $qrCode);
-
-        // // Génération du PDF
-        // $view = 'pdf.client';
-        // $data = ['client' => $client, 'user' => $user];
-        // $filePath = storage_path('app/public/pdfs/'. $client->id. '.pdf');
-        // PdfFacade::generatePdf($view, $data, $filePath);
-
-        // Génération de la carte de fidélité
-        // $this->generateFidelityCard($user);
-
-        DB::commit();
-
-        return $this->sendResponse(new ClientResource($client), StateEnum::SUCCESS);
-       
-        // Génération de la carte de fidélité
-        // $this->generateFidelityCard($user);
-
-
-    } catch (QueryException $e) {
-        DB::rollBack();
-        return $this->sendErrorResponse('Database error: ' . $e->getMessage(), StateEnum::ECHEC);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return $this->sendErrorResponse('An error occurred: ' . $e->getMessage(), StateEnum::ECHEC);
-    }
-}
-
-
-
-    public function show(string $id): JsonResponse
+    public function show($id): JsonResponse
     {
-        $client = Client::find($id);
-
-        if (!$client) {
-            return $this->sendErrorResponse('Client not found', StateEnum::ECHEC);
+        $client = $this->clientService->getClientById($id);
+        if ($client) {
+            return response()->json($client);
         }
-
-        return $this->sendResponse(new ClientResource($client), StateEnum::SUCCESS);
+        return response()->json(['message' => 'Client not found'], 404);
     }
 
     public function update(StoreClientRequest $request, int $id): JsonResponse
     {
-        try {
-            DB::beginTransaction();
-            
-            $client = Client::findOrFail($id);
-            
-            $clientData = $request->only('surname', 'address', 'telephone');
-            $client->update($clientData);
-
-            if ($request->has('user')) {
-                $user = $client->user;
-                if ($user) {
-                    $userData = $request->input('user');
-                    $user->update([
-                        'nom' => $userData['nom'] ?? $user->nom,
-                        'prenom' => $userData['prenom'] ?? $user->prenom,
-                        'login' => $userData['login'] ?? $user->login,
-                        'password' => $userData['password'] ?? $user->password,
-                        'role' => $userData['role'] ?? $user->role,
-                    ]);
-                }
-            }
-
-            DB::commit();
-            return $this->sendResponse(new ClientResource($client), StateEnum::SUCCESS);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->sendErrorResponse('An error occurred: ' . $e->getMessage(), StateEnum::ECHEC);
-        }
+        $client = $this->clientService->updateClient($request, $id);
+        return response()->json(['data' => $client], 200);
     }
 
-    public function destroy(int $id): JsonResponse
+    // app/Http/Controllers/ClientController.php
+    public function destroy($id)
     {
-        try {
-            DB::beginTransaction();
-
-            $client = Client::findOrFail($id);
-
-            if ($client->user) {
-                $client->user->delete();
-            }
-
+        $client = Client::find($id);
+        
+        if ($client) {
             $client->delete();
-
-            DB::commit();
-            return $this->sendResponse(null, StateEnum::SUCCESS);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->sendErrorResponse('An error occurred: ' . $e->getMessage(), StateEnum::ECHEC);
-        }
-    }
-
-    public function clientByTelephone(Request $request)
-    {
-        $telephone = $request->input('telephone');
-        // dd($telephone);
-    
-        // Recherchez un client par son numéro de téléphone
-        $client = Client::where('telephone', $telephone)->first();
-    
-        if (!$client) {
-            return $this->sendErrorResponse('Client not found', StateEnum::ECHEC);
-        }
-    if($client->user){
-        $client->user->photo = $client->user->photo;
-        $client->user->role = $client->user->role_id;
-        $client->user->etat = $client->user->etat;
-    }
-    $imagePath = storage_path('app/public/' . $client->user->photo); // Chemin vers l'image, ajustez selon votre configuration
-    if (file_exists($imagePath)) {
-        $imageData = file_get_contents($imagePath);
-        $base64Image = base64_encode($imageData);
-        $client->user->photo = 'data:image/jpeg;base64,' . $base64Image; // Assurez-vous de définir le bon type MIME
-    } else {
-        $client->photo = null;
-    }
-
-        return $this->sendResponse(new ClientResource($client), StateEnum::SUCCESS);
-    }
-    
-
-    public function findByTelephone($telephone): JsonResponse
-    {
-        $client = Client::where('telephone', $telephone)->first();
-
-        if (!$client) {
-            return response()->json([
-                'message' => 'Client not found'
-            ], 404);
+            return response()->json(['message' => 'Client supprimé avec succès.'], 200);
         }
 
-        return response()->json($client);
-
-        // Si le client a une image associée
-        if ($client->photo) {
-            // Lire le fichier image
-            $imagePath = storage_path('app/public/' . $client->photo); // Chemin vers l'image, ajustez selon votre configuration
-            if (file_exists($imagePath)) {
-                $imageData = file_get_contents($imagePath);
-                $base64Image = base64_encode($imageData);
-                $client->photo = 'data:image/jpeg;base64,' . $base64Image; // Assurez-vous de définir le bon type MIME
-            } else {
-                $client->photo = null;
-            }
-        }
-
-        return $this->sendResponse(new ClientResource($client), StateEnum::SUCCESS);
+        return response()->json(['message' => 'Client non trouvé.'], 404);
     }
 
-  /*   public function sendFidelityCard($clientId)
-    {
-        // Récupérez le client et le fichier de la carte de fidélité
-        $client = Client::find($clientId);
-        $filePath = storage_path('app/public/qrcodes/client_' . $clientId . '.png');
-
-        // Envoyer l'e-mail
-        Mail::to($client->email)->send(new FidelityCardMail($filePath));
-
-        return response()->json(['status' => 'success', 'message' => 'E-mail envoyé avec succès.']);
-    } */
-
-    }
-
-    
-
-
-
+}

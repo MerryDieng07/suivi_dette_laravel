@@ -1,43 +1,32 @@
 <?php
 
+
 namespace App\Http\Requests;
 
-use App\Enums\RoleEnum;
-use App\Enums\StateEnum;
-use App\Enums\UserRole;
-use App\Rules\CustumPasswordRule;
-use App\Rules\PasswordRules;
+use App\Models\User;
 use App\Enums\EtatEnum;
-use Illuminate\Contracts\Validation\Validator;
+use App\Rules\CustumPasswordRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-
 class StoreUserRequest extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
-    public function Rules(): array
+    // public function authorize()
+{
+//     return $this->user()->can('create', ['client']);
+// }
+
+    public function rules(): array
     {
         return [
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'login' => 'required|string|unique:users|max:255',
             'role_id' => 'required|numeric|exists:roles,id',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Re-décommente si nécessaire
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'etat' => 'required|string|in:' . implode(',', array_map(fn($case) => $case->value, EtatEnum::cases())),
-            'password' => ['required', 'confirmed', new CustumPasswordRule()],
+            'password' => ['required', 'string', 'min:6'], // Ajout de "confirmed" et la règle personnalisée
         ];
     }
 
@@ -56,10 +45,18 @@ class StoreUserRequest extends FormRequest
             'etat.required' => 'L\'état est obligatoire.',
             'etat.in' => 'L\'état doit être valide.',
             'password.required' => 'Le mot de passe est obligatoire.',
-            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+            'password.min' => 'Le mot de passe doit contenir au moins 6 caractères.',
+            // 'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
         ];
     }
-    
 
-  
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json(
+                ['message' => 'Erreur de validation', 'errors' => $validator->errors()],
+                422
+            )
+        );
+    }
 }

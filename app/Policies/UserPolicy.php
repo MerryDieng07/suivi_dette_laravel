@@ -3,63 +3,59 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use Illuminate\Database\Eloquent\Model;
 
 class UserPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Détermine si l'utilisateur peut voir n'importe quel utilisateur.
      */
-    // public function viewAny(User $user): bool
-    // {
-    //     //
-    // }
-
-    /**
-     * Determine whether the user can view the model.
-     */
-    // public function view(User $user, User $model): bool
-    // {
-    //     //
-    // }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    // public function create(User $user): bool
-    // {
-    //     //
-    // }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, User $model): bool
+    public function viewAny(User $user)
     {
-        return $user->id === $model->id || $user->role === 'admin';
+        return $user->role_id === 1; // Seul l'Admin peut voir tous les utilisateurs
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Détermine si l'utilisateur peut voir un utilisateur spécifique.
      */
-    // public function delete(User $user, User $model): bool
-    // {
-    //     //
-    // }
+    public function view(User $user, User $model)
+    {
+        return $user->id === $model->id || $user->role_id === 1; // Admin ou l'utilisateur lui-même
+    }
 
     /**
-     * Determine whether the user can restore the model.
+     * Détermine si l'utilisateur peut créer d'autres utilisateurs.
      */
-    // public function restore(User $user, User $model): bool
-    // {
-    //     //
-    // }
+    public function create(User $user, ?string $roleType = null)
+{
+    if ($user->role_id === 1) {
+        // Admin peut créer des rôles 1 (Admin) et 2 (Boutiquier)
+        return in_array($roleType, ['admin', 'boutiquier']);
+    }
+
+    if ($user->role_id === 2) {
+        // Boutiquier peut créer des clients (rôle 3)
+        return $roleType === 'client';
+    }
+
+    // Par défaut, ne pas autoriser
+    return false;
+}
+
+    
+    /**
+     * Détermine si l'utilisateur peut mettre à jour un utilisateur spécifique.
+     */
+    public function update(User $user, User $model)
+    {
+        return $user->id === $model->id || $user->role_id === 1; // Admin ou l'utilisateur lui-même
+    }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Détermine si l'utilisateur peut supprimer un utilisateur spécifique.
      */
-    // public function forceDelete(User $user, User $model): bool
-    // {
-    //     //
-    // }
+    public function delete(User $user, User $model)
+    {
+        return $user->role_id === 1; // Seul l'Admin peut supprimer un utilisateur
+    }
 }

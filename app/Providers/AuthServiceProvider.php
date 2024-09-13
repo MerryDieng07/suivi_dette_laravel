@@ -3,27 +3,25 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Models\User;
+use App\Policies\UserPolicy;
 use Laravel\Passport\Passport;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
+     * La carte des policies pour les modèles.
      */
-    protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
-    ];
+    // protected $policies = [
+    //     User::class => UserPolicy::class, 
+    // ];
 
     /**
-     * Register any authentication / authorization services.
+     * Enregistre n'importe quel service d'authentification ou d'autorisation.
      */
-    public function boot(): void
+    public function boot()
     {
         $this->registerPolicies();
-        // Passport::loadKeysFrom(storage_path('oauth-public.key'));
-
-        //
     }
 }

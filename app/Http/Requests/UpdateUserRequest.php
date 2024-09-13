@@ -6,23 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'nom' => 'nullable|string|max:255',
+            'prenom' => 'nullable|string|max:255',
+            'login' => 'nullable|string|unique:users,login,' . $this->user->id . '|max:255',
+            'password' => 'nullable|string|min:6',
+            'role_id' => 'nullable|numeric|exists:roles,id',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

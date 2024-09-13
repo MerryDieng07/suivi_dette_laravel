@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca3b0b1de1a742760247229bea753503",
+    "content-hash": "6e36b9873ca111992a5ec4ebdce1cd46",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -738,16 +738,16 @@
         },
         {
             "name": "doctrine/annotations",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "e157ef3f3124bbf6fe7ce0ffd109e8a8ef284e7f"
+                "reference": "901c2ee5d26eb64ff43c47976e114bf00843acf7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/e157ef3f3124bbf6fe7ce0ffd109e8a8ef284e7f",
-                "reference": "e157ef3f3124bbf6fe7ce0ffd109e8a8ef284e7f",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/901c2ee5d26eb64ff43c47976e114bf00843acf7",
+                "reference": "901c2ee5d26eb64ff43c47976e114bf00843acf7",
                 "shasum": ""
             },
             "require": {
@@ -759,10 +759,10 @@
             "require-dev": {
                 "doctrine/cache": "^2.0",
                 "doctrine/coding-standard": "^10",
-                "phpstan/phpstan": "^1.8.0",
+                "phpstan/phpstan": "^1.10.28",
                 "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
-                "symfony/cache": "^5.4 || ^6",
-                "vimeo/psalm": "^4.10"
+                "symfony/cache": "^5.4 || ^6.4 || ^7",
+                "vimeo/psalm": "^4.30 || ^5.14"
             },
             "suggest": {
                 "php": "PHP 8.0 or higher comes with attributes, a native replacement for annotations"
@@ -808,9 +808,9 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/annotations/issues",
-                "source": "https://github.com/doctrine/annotations/tree/2.0.1"
+                "source": "https://github.com/doctrine/annotations/tree/2.0.2"
             },
-            "time": "2023-02-02T22:02:53+00:00"
+            "time": "2024-09-05T10:17:24+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -7929,6 +7929,59 @@
             "time": "2023-12-08T13:03:43+00:00"
         },
         {
+            "name": "twilio/sdk",
+            "version": "8.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twilio/twilio-php.git",
+                "reference": "da842421814abaacb1c57eaacd7e8de19bbdbee6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/da842421814abaacb1c57eaacd7e8de19bbdbee6",
+                "reference": "da842421814abaacb1c57eaacd7e8de19bbdbee6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^6.3 || ^7.0",
+                "phpunit/phpunit": ">=7.0 < 10"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "An HTTP client to execute the API requests"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Twilio\\": "src/Twilio/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Twilio API Team",
+                    "email": "api@twilio.com"
+                }
+            ],
+            "description": "A PHP wrapper for Twilio's API",
+            "homepage": "https://github.com/twilio/twilio-php",
+            "keywords": [
+                "api",
+                "sms",
+                "twilio"
+            ],
+            "support": {
+                "issues": "https://github.com/twilio/twilio-php/issues",
+                "source": "https://github.com/twilio/twilio-php/tree/8.3.0"
+            },
+            "time": "2024-09-05T13:01:28+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.1",
             "source": {
@@ -8414,16 +8467,16 @@
         },
         {
             "name": "laravel/pint",
-            "version": "v1.17.2",
+            "version": "v1.17.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
-                "reference": "e8a88130a25e3f9d4d5785e6a1afca98268ab110"
+                "reference": "9d77be916e145864f10788bb94531d03e1f7b482"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/e8a88130a25e3f9d4d5785e6a1afca98268ab110",
-                "reference": "e8a88130a25e3f9d4d5785e6a1afca98268ab110",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/9d77be916e145864f10788bb94531d03e1f7b482",
+                "reference": "9d77be916e145864f10788bb94531d03e1f7b482",
                 "shasum": ""
             },
             "require": {
@@ -8434,13 +8487,13 @@
                 "php": "^8.1.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.61.1",
-                "illuminate/view": "^10.48.18",
+                "friendsofphp/php-cs-fixer": "^3.64.0",
+                "illuminate/view": "^10.48.20",
                 "larastan/larastan": "^2.9.8",
                 "laravel-zero/framework": "^10.4.0",
                 "mockery/mockery": "^1.6.12",
                 "nunomaduro/termwind": "^1.15.1",
-                "pestphp/pest": "^2.35.0"
+                "pestphp/pest": "^2.35.1"
             },
             "bin": [
                 "builds/pint"
@@ -8476,20 +8529,20 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-            "time": "2024-08-06T15:11:54+00:00"
+            "time": "2024-09-03T15:00:28+00:00"
         },
         {
             "name": "laravel/sail",
-            "version": "v1.31.1",
+            "version": "v1.31.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "3d06dd18cee8059baa7b388af00ba47f6d96bd85"
+                "reference": "0a7e2891a85eba2d448a9ffc6fc5ce367e924bc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/3d06dd18cee8059baa7b388af00ba47f6d96bd85",
-                "reference": "3d06dd18cee8059baa7b388af00ba47f6d96bd85",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/0a7e2891a85eba2d448a9ffc6fc5ce367e924bc1",
+                "reference": "0a7e2891a85eba2d448a9ffc6fc5ce367e924bc1",
                 "shasum": ""
             },
             "require": {
@@ -8539,7 +8592,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2024-08-02T07:45:47+00:00"
+            "time": "2024-09-03T20:05:33+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -9221,16 +9274,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.30",
+            "version": "10.5.32",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b15524febac0153876b4ba9aab3326c2ee94c897"
+                "reference": "f069f46840445d37a4e6f0de8c5879598f9c4327"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b15524febac0153876b4ba9aab3326c2ee94c897",
-                "reference": "b15524febac0153876b4ba9aab3326c2ee94c897",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f069f46840445d37a4e6f0de8c5879598f9c4327",
+                "reference": "f069f46840445d37a4e6f0de8c5879598f9c4327",
                 "shasum": ""
             },
             "require": {
@@ -9244,7 +9297,7 @@
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.1",
-                "phpunit/php-code-coverage": "^10.1.15",
+                "phpunit/php-code-coverage": "^10.1.16",
                 "phpunit/php-file-iterator": "^4.1.0",
                 "phpunit/php-invoker": "^4.0.0",
                 "phpunit/php-text-template": "^3.0.1",
@@ -9302,7 +9355,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.30"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.32"
             },
             "funding": [
                 {
@@ -9318,7 +9371,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-13T06:09:37+00:00"
+            "time": "2024-09-04T13:33:39+00:00"
         },
         {
             "name": "sebastian/cli-parser",

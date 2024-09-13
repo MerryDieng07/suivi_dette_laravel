@@ -1,295 +1,817 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "API Client",
-      "version": "1.0.0",
-      "description": "API pour gérer les clients"
-    },
-    "servers": {
-        "url": "http://localhost:3000"
-  
-    },
-     
-    "paths": {
-      "/clients": {
-        "get": {
-          "summary": "List all clients",
-          "tags": ["Clients"],
-          "parameters": [
-            {
-              "name": "include",
-              "in": "query",
-              "description": "Include related resources",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "active",
-              "in": "query",
-              "description": "Filter by active status",
-              "schema": {
-                "type": "string",
-                "enum": ["oui", "non"]
-              }
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Client & Auth",
+    "version": "1.0.0",
+    "description": "API pour gérer les clients, les utilisateurs, les articles et l'authentification"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/clients": {
+      "get": {
+        "summary": "List all clients",
+        "tags": ["Clients"],
+        "parameters": [
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Include related resources",
+            "schema": {
+              "type": "string"
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of clients",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ClientCollection"
-                  }
-                }
-              }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": {
+              "type": "string",
+              "enum": ["oui", "non"]
             }
           }
-        },
-        "post": {
-          "summary": "Create a new client",
-          "tags": ["Clients"],
-          "requestBody": {
-            "required": true,
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of clients",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StoreClientRequest"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Client created successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ClientResource"
+                  "$ref": "#/components/schemas/ClientCollection"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "surname": "Doe",
+                          "adresse": "123 Rue Example",
+                          "telephone": "770000000",
+                          "user": {
+                            "nom": "John",
+                            "prenom": "Doe",
+                            "login": "johndoe",
+                            "roleId": 2,
+                            "etat": "ACTIF",
+                            "photo": "profile.jpg"
+                          }
+                        }
+                      ]
+                    }
                   }
                 }
               }
-            },
-            "400": {
-              "description": "Bad request"
             }
           }
         }
       },
-      "/clients/{id}": {
-        "get": {
-          "summary": "Get a client by ID",
-          "tags": ["Clients"],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "Client ID",
-              "required": true,
+      "post": {
+        "summary": "Create a new client",
+        "tags": ["Clients"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
               "schema": {
-                "type": "integer"
+                "$ref": "#/components/schemas/StoreClientRequest"
               }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Client details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ClientResource"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Client not found"
             }
           }
         },
-        "put": {
-          "summary": "Update a client",
-          "tags": ["Clients"],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "Client ID",
-              "required": true,
-              "schema": {
-                "type": "integer"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "201": {
+            "description": "Client created successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StoreClientRequest"
+                  "$ref": "#/components/schemas/ClientResource"
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Client updated successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ClientResource"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "404": {
-              "description": "Client not found"
-            }
-          }
-        },
-        "delete": {
-          "summary": "Delete a client",
-          "tags": ["Clients"],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "Client ID",
-              "required": true,
-              "schema": {
-                "type": "integer"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Client deleted successfully"
-            },
-            "404": {
-              "description": "Client not found"
-            }
+          "400": {
+            "description": "Bad request"
           }
         }
       }
     },
-    "components": {
-      "schemas": {
-        "ClientCollection": {
-          "type": "object",
-          "properties": {
-            "data": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/ClientResource"
-              }
+    "/clients/{id}": {
+      "get": {
+        "summary": "Get a client by ID",
+        "tags": ["Clients"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Client ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
-        "ClientResource": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer",
-              "example": 1
-            },
-            "surname": {
-              "type": "string",
-              "example": "Doe"
-            },
-            "adresse": {
-              "type": "string",
-              "example": "123 Rue Example"
-            },
-            "telephone": {
-              "type": "string",
-              "example": "770000000"
-            },
-            "user": {
-              "type": "object",
-              "properties": {
-                "nom": {
-                  "type": "string",
-                  "example": "John"
-                },
-                "prenom": {
-                  "type": "string",
-                  "example": "Doe"
-                },
-                "login": {
-                  "type": "string",
-                  "example": "johndoe"
-                },
-                "roleId": {
-                  "type": "integer",
-                  "example": 2
-                },
-                "etat": {
-                  "type": "string",
-                  "example": "ACTIF"
-                },
-                "photo": {
-                  "type": "string",
-                  "example": "profile.jpg"
+        ],
+        "responses": {
+          "200": {
+            "description": "Client details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientResource"
                 }
               }
             }
+          },
+          "404": {
+            "description": "Client not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a client",
+        "tags": ["Clients"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Client ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreClientRequest"
+              }
+            }
           }
         },
-        "StoreClientRequest": {
-          "type": "object",
-          "properties": {
-            "surname": {
+        "responses": {
+          "200": {
+            "description": "Client updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Client not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a client",
+        "tags": ["Clients"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Client ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Client deleted successfully"
+          },
+          "404": {
+            "description": "Client not found"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "Login a user",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              } 
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current user details",
+        "tags": ["Auth"],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/update": {
+      "put": {
+        "summary": "Update user profile",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "List all users",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "active",
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": {
               "type": "string",
-              "example": "Doe"
-            },
-            "adresse": {
-              "type": "string",
-              "example": "123 Rue Example"
-            },
-            "telephone": {
-              "type": "string",
-              "example": "770000000"
-            },
-            "user": {
-              "type": "object",
-              "properties": {
-                "nom": {
-                  "type": "string",
-                  "example": "John"
-                },
-                "prenom": {
-                  "type": "string",
-                  "example": "Doe"
-                },
-                "login": {
-                  "type": "string",
-                  "example": "johndoe"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "password123"
-                },
-                "roleId": {
-                  "type": "integer",
-                  "example": 2
-                },
-                "etat": {
-                  "type": "string",
-                  "example": "ACTIF"
-                },
-                "photo": {
-                  "type": "string",
-                  "example": "profile.jpg"
+              "enum": ["oui", "non"]
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "Filter by role",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCollection"
                 }
               }
             }
           }
         }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a user",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/articles": {
+      "get": {
+        "summary": "List all articles",
+        "tags": ["Articles"],
+        "parameters": [
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Include related resources",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of articles per page",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of articles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleCollection"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new article",
+        "tags": ["Articles"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreArticleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Article created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/articles/{id}": {
+      "get": {
+        "summary": "Get an article by ID",
+        "tags": ["Articles"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Article details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Article not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an article",
+        "tags": ["Articles"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreArticleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Article updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Article not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an article",
+        "tags": ["Articles"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Article deleted successfully"
+          },
+          "404": {
+            "description": "Article not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClientCollection": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientResource"
+            }
+          }
+        }
+      },
+      "ClientResource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "adresse": {
+            "type": "string"
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResource"
+          }
+        }
+      },
+      "StoreClientRequest": {
+        "type": "object",
+        "properties": {
+          "surname": {
+            "type": "string"
+          },
+          "adresse": {
+            "type": "string"
+          },
+          "telephone": {
+            "type": "string"
+          }
+        },
+        "required": ["surname", "adresse", "telephone"]
+      },
+      "ArticleCollection": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArticleResource"
+            }
+          }
+        }
+      },
+      "ArticleResource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "quantity": {
+            "type": "integer"
+          }
+        }
+      },
+      "StoreArticleRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "quantity": {
+            "type": "integer"
+          }
+        },
+        "required": ["name", "price", "quantity"]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": ["username", "password"]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "UserResource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nom": {
+            "type": "string"
+          },
+          "prenom": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "roleId": {
+            "type": "integer"
+          },
+          "etat": {
+            "type": "string"
+          },
+          "photo": {
+            "type": "string"
+          }
+        }
+      },
+      "StoreUserRequest": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string"
+          },
+          "prenom": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "roleId": {
+            "type": "integer"
+          }
+        },
+        "required": ["nom", "prenom", "login", "password", "roleId"]
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string"
+          },
+          "prenom": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "roleId": {
+            "type": "integer"
+          },
+          "etat": {
+            "type": "string"
+          },
+          "photo": {
+            "type": "string"
+          }
+        },
+        "required": ["nom", "prenom", "login", "roleId"]
       }
     }
   }
-  
+}

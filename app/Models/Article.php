@@ -18,6 +18,11 @@ class Article extends Model
      * @param  string  $libelle
      * @return \Illuminate\Database\Eloquent\Builder
      */
+
+     protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
     public function scopeFilterByLibelle($query, $libelle)
     {
         return $query->where('libelle', 'LIKE', '%' . $libelle . '%');
@@ -33,5 +38,11 @@ class Article extends Model
         return $query->where('qteStock', '>=', $quantite);
     }
     
-    // Autres méthodes ou relations peuvent être ajoutées ici
+    // Relations avec la table déttes
+    public function dettes()
+    {
+        return $this->belongsToMany(Dette::class, 'article_dette')
+                    ->withPivot('quantite', 'prix')
+                    ->withTimestamps();
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Rules;
 
 use Closure;
@@ -16,19 +17,27 @@ class CustumPasswordRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $messages = [
-           0=> 'Le champ :attribute est obligatoire.',
-            1=> 'Le mot de passe doit contenir au moins :min caractères.',
-             2 => 'Le mot de passe doit contenir au moins un chiffre, une lettre, et un caractère spécial.',
-        ];
-        // dd($attribute);
-        $validator = Validator::make(request()->all(), [
-            $attribute => ['required', Password::min(8)->letters()->mixedCase()->numbers()->uncompromised()],
-        ]);
+        // Validator pour vérifier les critères de sécurité du mot de passe
+        $validator = Validator::make(
+            [$attribute => $value], // On vérifie seulement le champ actuel
+            [
+                $attribute => [
+                    'required',
+                    Password::min(8)
+                        ->letters()
+                        ->mixedCase()
+                        ->numbers()
+                        ->symbols() // pour inclure les caractères spéciaux
+                        ->uncompromised(), // Vérifie que le mot de passe n'a pas été compromis dans des fuites de données
+                ],
+            ]
+        );
 
-
-        if (!$validator->passes()) {
-            $fail($validator->messages());
+        // Si la validation échoue, on retourne les messages d'erreur
+        if ($validator->fails()) {
+            foreach ($validator->errors()->all() as $error) {
+                $fail($error); // On passe chaque erreur à la fonction de fail
+            }
         }
     }
 }

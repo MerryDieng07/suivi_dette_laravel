@@ -7,6 +7,9 @@ use App\Services\UploadServiceInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
+
+
+
 class HandleClientPhotoUpload implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -24,7 +27,7 @@ class HandleClientPhotoUpload implements ShouldQueue
         $photo = $event->photo;
 
         if ($photo) {
-            $this->uploadService->uploadPhoto($photo, $clientData['user_id']);
+            $this->uploadService->uploadFile($photo, $clientData['user_id']);
         }
     }
 }
